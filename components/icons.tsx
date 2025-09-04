@@ -1172,3 +1172,25 @@ export const WarningIcon = ({ size = 16 }: { size?: number }) => {
     </svg>
   );
 };
+
+// Displays the Lexer logo image as an icon
+export const LexerIcon = ({
+  size = 16,
+  className,
+  alt = 'Lexer',
+}: {
+  size?: number;
+  className?: string;
+  alt?: string;
+}) => {
+  return (
+    <img
+      src="/images/lexer-logo-white.png"
+      alt={alt}
+      width={size}
+      height={size}
+      className={className}
+      style={{ display: 'inline-block', objectFit: 'contain' }}
+    />
+  );
+};

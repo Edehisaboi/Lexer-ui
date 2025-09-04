@@ -1,7 +1,6 @@
 import { Artifact } from '@/components/create-artifact';
 import {
   CopyIcon,
-  LineChartIcon,
   RedoIcon,
   SparklesIcon,
   UndoIcon,
@@ -21,7 +20,8 @@ export const sheetArtifact = new Artifact<'sheet', Metadata>({
       setArtifact((draftArtifact) => ({
         ...draftArtifact,
         content: streamPart.data,
-        isVisible: true,
+        isVisible: 
+        draftArtifact.status === 'streaming',
         status: 'streaming',
       }));
     }
@@ -98,21 +98,6 @@ export const sheetArtifact = new Artifact<'sheet', Metadata>({
           role: 'user',
           parts: [
             { type: 'text', text: 'Can you please format and clean the data?' },
-          ],
-        });
-      },
-    },
-    {
-      description: 'Analyze and visualize data',
-      icon: <LineChartIcon />,
-      onClick: ({ sendMessage }) => {
-        sendMessage({
-          role: 'user',
-          parts: [
-            {
-              type: 'text',
-              text: 'Can you please analyze and visualize the data by creating a new code artifact in python?',
-            },
           ],
         });
       },

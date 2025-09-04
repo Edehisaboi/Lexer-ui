@@ -42,12 +42,9 @@ export const textArtifact = new Artifact<'text', TextArtifactMetadata>({
         return {
           ...draftArtifact,
           content: draftArtifact.content + streamPart.data,
-          isVisible:
-            draftArtifact.status === 'streaming' &&
-            draftArtifact.content.length > 400 &&
-            draftArtifact.content.length < 450
-              ? true
-              : draftArtifact.isVisible,
+          isVisible: 
+          draftArtifact.status === 'streaming' &&
+              draftArtifact.content.length > 1,
           status: 'streaming',
         };
       });
@@ -65,7 +62,7 @@ export const textArtifact = new Artifact<'text', TextArtifactMetadata>({
     metadata,
   }) => {
     if (isLoading) {
-      return <DocumentSkeleton artifactKind="text" />;
+      return <DocumentSkeleton/>;
     }
 
     if (mode === 'diff') {
@@ -101,13 +98,7 @@ export const textArtifact = new Artifact<'text', TextArtifactMetadata>({
       onClick: ({ handleVersionChange }) => {
         handleVersionChange('toggle');
       },
-      isDisabled: ({ currentVersionIndex, setMetadata }) => {
-        if (currentVersionIndex === 0) {
-          return true;
-        }
-
-        return false;
-      },
+      isDisabled: ({ currentVersionIndex }) => currentVersionIndex === 0,
     },
     {
       icon: <UndoIcon size={18} />,

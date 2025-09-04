@@ -17,7 +17,7 @@ import { useLocalStorage, useWindowSize } from 'usehooks-ts';
 import { ArrowUpIcon, PaperclipIcon, StopIcon } from './icons';
 import { PreviewAttachment } from './preview-attachment';
 import { Button } from './ui/button';
-import { SuggestedActions } from './suggested-actions';
+//import { SuggestedActions } from './suggested-actions';
 import {
   PromptInput,
   PromptInputTextarea,
@@ -62,6 +62,8 @@ function PureMultimodalInput({
 }) {
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const { width } = useWindowSize();
+  const MIN_TEXTAREA_HEIGHT = 150;
+  const MAX_TEXTAREA_HEIGHT = 350;
 
   useEffect(() => {
     if (textareaRef.current) {
@@ -71,15 +73,21 @@ function PureMultimodalInput({
 
   const adjustHeight = () => {
     if (textareaRef.current) {
-      textareaRef.current.style.height = 'auto';
-      textareaRef.current.style.height = `${textareaRef.current.scrollHeight + 2}px`;
+      const textarea = textareaRef.current;
+      textarea.style.height = 'auto';
+      const measuredHeight = textarea.scrollHeight + 2;
+      const clampedHeight = Math.max(
+        MIN_TEXTAREA_HEIGHT,
+        Math.min(measuredHeight, MAX_TEXTAREA_HEIGHT),
+      );
+      textarea.style.height = `${clampedHeight}px`;
     }
   };
 
   const resetHeight = () => {
     if (textareaRef.current) {
       textareaRef.current.style.height = 'auto';
-      textareaRef.current.style.height = '98px';
+      textareaRef.current.style.height = `${MIN_TEXTAREA_HEIGHT}px`;
     }
   };
 
@@ -103,6 +111,10 @@ function PureMultimodalInput({
   useEffect(() => {
     setLocalStorageInput(input);
   }, [input, setLocalStorageInput]);
+
+  useEffect(() => {
+    adjustHeight();
+  }, [input]);
 
   const handleInput = (event: React.ChangeEvent<HTMLTextAreaElement>) => {
     setInput(event.target.value);
@@ -237,7 +249,8 @@ function PureMultimodalInput({
         )}
       </AnimatePresence>
 
-      {messages.length === 0 &&
+      {/* Hide Suggested Actions */}
+      {/* {messages.length === 0 &&
         attachments.length === 0 &&
         uploadQueue.length === 0 && (
           <SuggestedActions
@@ -245,7 +258,7 @@ function PureMultimodalInput({
             chatId={chatId}
             selectedVisibilityType={selectedVisibilityType}
           />
-        )}
+        )} */}
 
       <input
         type="file"
@@ -307,10 +320,14 @@ function PureMultimodalInput({
           placeholder="Send a message..."
           value={input}
           onChange={handleInput}
-          minHeight={48}
-          maxHeight={48}
+          minHeight={150}
+          maxHeight={350}
           disableAutoResize={true}
-          style={{ height: '48px', minHeight: '48px', maxHeight: '48px' }}
+          style={{
+            height: '150px',
+            minHeight: '150px',
+            maxHeight: '350px',
+          }}
           className="text-sm resize-none py-1 px-3 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]"
           rows={1}
           autoFocus

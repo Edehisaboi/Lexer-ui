@@ -20,10 +20,9 @@ import { ArtifactCloseButton } from './artifact-close-button';
 import { ArtifactMessages } from './artifact-messages';
 import { useSidebar } from './ui/sidebar';
 import { useArtifact } from '@/hooks/use-artifact';
-import { imageArtifact } from '@/artifacts/image/client';
-import { codeArtifact } from '@/artifacts/code/client';
 import { sheetArtifact } from '@/artifacts/sheet/client';
 import { textArtifact } from '@/artifacts/text/client';
+import { tiptapArtifact } from '@/artifacts/tiptap/client';
 import equal from 'fast-deep-equal';
 import type { UseChatHelpers } from '@ai-sdk/react';
 import type { VisibilityType } from './visibility-selector';
@@ -31,9 +30,8 @@ import type { Attachment, ChatMessage } from '@/lib/types';
 
 export const artifactDefinitions = [
   textArtifact,
-  codeArtifact,
-  imageArtifact,
   sheetArtifact,
+  tiptapArtifact,
 ];
 export type ArtifactKind = (typeof artifactDefinitions)[number]['kind'];
 
@@ -343,7 +341,11 @@ function PureArtifact({
           )}
 
           <motion.div
-            className="fixed dark:bg-muted bg-background h-dvh flex flex-col overflow-y-scroll md:border-l dark:border-zinc-700 border-zinc-200"
+            className={`fixed dark:bg-muted bg-background h-dvh flex flex-col ${
+              artifact.kind === 'tiptap'
+                ? 'overflow-hidden'
+                : 'overflow-y-scroll'
+            } md:border-l dark:border-zinc-700 border-zinc-200`}
             initial={
               isMobile
                 ? {
@@ -447,7 +449,13 @@ function PureArtifact({
               />
             </div>
 
-            <div className="dark:bg-muted bg-background h-full overflow-y-scroll !max-w-full items-center">
+            <div
+              className={`dark:bg-muted bg-background h-full !max-w-full items-center ${
+                artifact.kind === 'tiptap'
+                  ? 'overflow-hidden'
+                  : 'overflow-y-scroll'
+              }`}
+            >
               <artifactDefinition.content
                 title={artifact.title}
                 content={

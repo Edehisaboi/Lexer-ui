@@ -1,4 +1,5 @@
 import { motion } from 'framer-motion';
+import { LexerIcon } from '@/components/icons';
 
 export const Greeting = () => {
   return (
@@ -10,19 +11,29 @@ export const Greeting = () => {
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
         exit={{ opacity: 0, y: 10 }}
+        transition={{ delay: 0.4 }}
+        className="text-2xl font-semibold"
+      >
+        <LexerIcon size={150} />
+      </motion.div>
+      <motion.div
+        initial={{ opacity: 0, y: 10 }}
+        animate={{ opacity: 1, y: 0 }}
+        exit={{ opacity: 0, y: 10 }}
         transition={{ delay: 0.5 }}
         className="text-2xl font-semibold"
       >
-        Hello there!
+        Lexer, draft legal documents with AI!
       </motion.div>
       <motion.div
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
         exit={{ opacity: 0, y: 10 }}
         transition={{ delay: 0.6 }}
-        className="text-2xl text-zinc-500"
+        className="text-xl text-zinc-500"
       >
-        How can I help you today?
+        Describe the document you need, and let Lexer handle the rest. Begin by
+        typing your request in the input box below.
       </motion.div>
     </div>
   );

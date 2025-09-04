@@ -1,0 +1,13 @@
+[6 tools called]
+
+- @codemirror/lang-javascript
+- @codemirror/lang-python
+- @codemirror/state
+- @codemirror/theme-one-dark
+- @codemirror/view
+- codemirror
+- shiki
+
+Notes:
+- These are only used by the removed Code artifact/editor. I verified no remaining imports reference them.
+- Keep react-syntax-highlighter; it’s still used by CodeBlock in the UI.

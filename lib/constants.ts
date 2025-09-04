@@ -11,3 +11,5 @@ export const isTestEnvironment = Boolean(
 export const guestRegex = /^guest-\d+$/;
 
 export const DUMMY_PASSWORD = generateDummyPassword();
+
+export const WS_BASE_URL = "ws://localhost:8000"
