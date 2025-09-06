@@ -19,9 +19,9 @@ import {
 } from '@/lib/db/queries';
 import { convertToUIMessages, generateUUID } from '@/lib/utils';
 import { generateTitleFromUserMessage } from '../../actions';
-import { createDocument } from '@/lib/ai/tools/create-document';
-import { updateDocument } from '@/lib/ai/tools/update-document';
-import { requestSuggestions } from '@/lib/ai/tools/request-suggestions';
+// import { createDocument } from '@/lib/ai/tools/create-document';
+// import { updateDocument } from '@/lib/ai/tools/update-document';
+// import { requestSuggestions } from '@/lib/ai/tools/request-suggestions';
 import { createLegalDocument } from '@/lib/ai/tools/create-legal-document';
 import { isProductionEnvironment } from '@/lib/constants';
 import { myProvider } from '@/lib/ai/providers';
@@ -147,19 +147,19 @@ export async function POST(request: Request) {
           messages: convertToModelMessages(uiMessages),
           stopWhen: stepCountIs(5),
           experimental_activeTools: [
-            'createDocument',
-            'updateDocument',
-            'requestSuggestions',
+            // 'createDocument',
+            // 'updateDocument',
+            // 'requestSuggestions',
             'createLegalDocument',
           ],
           experimental_transform: smoothStream({ chunking: 'word' }),
           tools: {
-            createDocument: createDocument({ session, dataStream }),
-            updateDocument: updateDocument({ session, dataStream }),
-            requestSuggestions: requestSuggestions({
-              session,
-              dataStream,
-            }),
+            //createDocument: createDocument({ session, dataStream }),
+            //updateDocument: updateDocument({ session, dataStream }),
+            // requestSuggestions: requestSuggestions({
+            //   session,
+            //   dataStream,
+            // }),
             createLegalDocument: createLegalDocument({
               session,
               dataStream,

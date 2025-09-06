@@ -56,7 +56,8 @@ export async function GET(
     return new ChatSDKError('not_found:stream').toResponse();
   }
 
-  const recentStreamId = streamIds.at(-1);
+  const recentStreamId =
+    streamIds.length > 0 ? streamIds[streamIds.length - 1] : undefined;
 
   if (!recentStreamId) {
     return new ChatSDKError('not_found:stream').toResponse();
@@ -76,7 +77,8 @@ export async function GET(
    */
   if (!stream) {
     const messages = await getMessagesByChatId({ id: chatId });
-    const mostRecentMessage = messages.at(-1);
+    const mostRecentMessage =
+      messages.length > 0 ? messages[messages.length - 1] : undefined;
 
     if (!mostRecentMessage) {
       return new Response(emptyDataStream, { status: 200 });
