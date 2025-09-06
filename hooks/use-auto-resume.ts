@@ -23,7 +23,10 @@ export function useAutoResume({
   useEffect(() => {
     if (!autoResume) return;
 
-    const mostRecentMessage = initialMessages.at(-1);
+    const mostRecentMessage =
+      initialMessages.length > 0
+        ? initialMessages[initialMessages.length - 1]
+        : undefined;
 
     if (mostRecentMessage?.role === 'user') {
       resumeStream();
