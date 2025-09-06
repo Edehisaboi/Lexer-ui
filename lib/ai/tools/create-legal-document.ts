@@ -1,8 +1,9 @@
-import { generateUUID } from '@/lib/utils';
+import { generateUUID, agentUpdatesMessage } from '@/lib/utils';
 import { tool, type UIMessageStreamWriter } from 'ai';
 import { z } from 'zod';
 import type { Session } from 'next-auth';
-import { WebSocketApiService } from '@/lib/agent/websocketAPI';
+import { WebSocketApiService } from '@/lib/agent/web-socket-api';
+import { saveDocument } from '@/lib/db/queries';
 import type { ChatMessage } from '@/lib/types';
 
 interface CreateLegalDocumentProps {
@@ -17,14 +18,20 @@ export const createLegalDocument = ({
   chatId,
 }: CreateLegalDocumentProps) =>
   tool({
-    description: '',
+    description:
+      'Create a legal document for a legal advice, contract or other legal writing.',
     inputSchema: z.object({
-      isNewDocument: z.boolean().describe('Whether to create a new document'),
-      message: z.string().describe(''),
+      isNewDocument: z
+        .boolean()
+        .describe('Is this a new document being created?'),
+      message: z
+        .string()
+        .describe('The entire user message, for requesting a legal document'),
     }),
     execute: async ({ isNewDocument, message }) => {
       const id = generateUUID();
       const documentService = new WebSocketApiService();
+      let interruptContent: string | null = null;
 
       dataStream.write({
         type: 'data-kind',
@@ -50,6 +57,12 @@ export const createLegalDocument = ({
         transient: true,
       });
 
+      // Start a reasoning stream
+      dataStream.write({
+        type: 'reasoning-start',
+        id: id,
+      });
+
       await documentService.generateDocument(chatId, isNewDocument, message, {
         onChunk: (chunk) => {
           dataStream.write({
@@ -58,15 +71,52 @@ export const createLegalDocument = ({
             transient: true,
           });
         },
+        onInterrupt: (payload) => {
+          interruptContent = payload;
+        },
+        onUpdate: (node) => {
+          const thinkingMessage =
+            agentUpdatesMessage[node] ?? 'Working on your document...';
+
+          // Stream the thinking message to the UI
+          dataStream.write({
+            type: 'reasoning-delta',
+            id: id,
+            delta: `${thinkingMessage}\n\n`,
+          });
+        },
+        onDraftContent: async (draftContent) => {
+          if (!session.user.id) return;
+          await saveDocument({
+            id: id,
+            title: 'Legal Document',
+            content: draftContent,
+            kind: 'tiptap',
+            userId: session.user.id,
+          });
+        },
         onStreamingEnd: () => {
-          documentService.disconnect;
+          // End reasoning stream
+          dataStream.write({
+            type: 'reasoning-end',
+            id: id,
+          });
+
+          dataStream.write({
+            type: 'data-finish',
+            data: null,
+            transient: true,
+          });
         },
       });
 
       return {
         id,
+        title: 'Legal Document',
         kind: 'tiptap',
-        content: 'A legal document was created and is now visible to the user.',
+        content:
+          interruptContent ||
+          'Success! The legal document was created and is now visible to the user.',
       };
     },
   });
