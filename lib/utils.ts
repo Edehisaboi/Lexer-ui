@@ -68,7 +68,9 @@ type ResponseMessage = ResponseMessageWithoutId & { id: string };
 
 export function getMostRecentUserMessage(messages: Array<UIMessage>) {
   const userMessages = messages.filter((message) => message.role === 'user');
-  return userMessages.at(-1);
+  return userMessages.length > 0
+    ? userMessages[userMessages.length - 1]
+    : undefined;
 }
 
 export function getDocumentTimestampByIndex(
@@ -86,7 +88,8 @@ export function getTrailingMessageId({
 }: {
   messages: Array<ResponseMessage>;
 }): string | null {
-  const trailingMessage = messages.at(-1);
+  const trailingMessage =
+    messages.length > 0 ? messages[messages.length - 1] : undefined;
 
   if (!trailingMessage) return null;
 
@@ -114,3 +117,15 @@ export function getTextFromMessage(message: ChatMessage): string {
     .map((part) => part.text)
     .join('');
 }
+
+export const agentUpdatesMessage: Record<string, string> = {
+    "capture_user_intent": "Analyzing your request to understand the type of document you need...",
+    "analyze_requirements": "Checking the document requirements and making sure we have all the necessary details...",
+    "__interrupt__": "We need some more information from you before continuing...",
+    "collect_missing_info": "Gathering the missing details to complete the document setup...",
+    "retrieve_template": "Finding the most suitable legal template for your case...",
+    "create_blueprint": "Structuring the document outline and preparing the foundation...",
+    "generate_draft": "Generating the first draft of your document...",
+    "audit_quality": "Reviewing the draft for accuracy, clarity, and completeness...",
+    "finalize_document": "Finalizing and polishing your document for delivery..."
+};

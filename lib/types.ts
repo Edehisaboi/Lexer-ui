@@ -1,5 +1,6 @@
 import { z } from 'zod';
 import type { createDocument } from './ai/tools/create-document';
+import type { createLegalDocument } from './ai/tools/create-legal-document';
 import type { updateDocument } from './ai/tools/update-document';
 import type { requestSuggestions } from './ai/tools/request-suggestions';
 import type { InferUITool, UIMessage } from 'ai';
@@ -16,6 +17,9 @@ export const messageMetadataSchema = z.object({
 export type MessageMetadata = z.infer<typeof messageMetadataSchema>;
 
 type createDocumentTool = InferUITool<ReturnType<typeof createDocument>>;
+type createLegalDocumentTool = InferUITool<
+  ReturnType<typeof createLegalDocument>
+>;
 type updateDocumentTool = InferUITool<ReturnType<typeof updateDocument>>;
 type requestSuggestionsTool = InferUITool<
   ReturnType<typeof requestSuggestions>
@@ -23,6 +27,7 @@ type requestSuggestionsTool = InferUITool<
 
 export type ChatTools = {
   createDocument: createDocumentTool;
+  createLegalDocument: createLegalDocumentTool;
   updateDocument: updateDocumentTool;
   requestSuggestions: requestSuggestionsTool;
 };
