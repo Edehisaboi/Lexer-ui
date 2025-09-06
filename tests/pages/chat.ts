@@ -175,7 +175,10 @@ export class ChatPage {
 
   async getRecentUserMessage() {
     const messageElements = await this.page.getByTestId('message-user').all();
-    const lastMessageElement = messageElements.at(-1);
+    const lastMessageElement =
+      messageElements.length > 0
+        ? messageElements[messageElements.length - 1]
+        : undefined;
 
     if (!lastMessageElement) {
       throw new Error('No user message found');
