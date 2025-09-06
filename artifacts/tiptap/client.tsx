@@ -1,6 +1,12 @@
 import { Artifact } from '@/components/create-artifact';
 import { SimpleEditor } from '@/components/tiptap-templates/simple/simple-editor';
-import { CopyIcon, MessageIcon, PenIcon, RedoIcon, UndoIcon } from '@/components/icons';
+import {
+  CopyIcon,
+  MessageIcon,
+  PenIcon,
+  RedoIcon,
+  UndoIcon,
+} from '@/components/icons';
 import { toast } from 'sonner';
 
 export const tiptapArtifact = new Artifact<'tiptap'>({
@@ -11,9 +17,7 @@ export const tiptapArtifact = new Artifact<'tiptap'>({
       setArtifact((draft) => ({
         ...draft,
         content: draft.content + streamPart.data,
-        isVisible:
-        draft.status === 'streaming' &&
-            draft.content.length > 1,
+        isVisible: draft.status === 'streaming' && draft.content.length > 1,
         status: 'streaming',
       }));
     }
