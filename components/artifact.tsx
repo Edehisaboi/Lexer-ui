@@ -102,7 +102,7 @@ function PureArtifact({
 
   useEffect(() => {
     if (documents && documents.length > 0) {
-      const mostRecentDocument = documents.at(-1);
+      const mostRecentDocument = documents[documents.length - 1];
 
       if (mostRecentDocument) {
         setDocument(mostRecentDocument);
@@ -131,7 +131,7 @@ function PureArtifact({
         async (currentDocuments) => {
           if (!currentDocuments) return undefined;
 
-          const currentDocument = currentDocuments.at(-1);
+          const currentDocument = currentDocuments[currentDocuments.length - 1];
 
           if (!currentDocument || !currentDocument.content) {
             setIsContentDirty(false);
@@ -142,7 +142,7 @@ function PureArtifact({
             await fetch(`/api/document?id=${artifact.documentId}`, {
               method: 'POST',
               body: JSON.stringify({
-                title: artifact.title,
+                title: artifact.title || currentDocument.title,
                 content: updatedContent,
                 kind: artifact.kind,
               }),

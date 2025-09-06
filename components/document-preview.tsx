@@ -39,7 +39,13 @@ export function DocumentPreview({
     Array<Document>
   >(result ? `/api/document?id=${result.id}` : null, fetcher);
 
-  const previewDocument = useMemo(() => documents?.at(-1), [documents]);
+  const previewDocument = useMemo(
+    () =>
+      Array.isArray(documents) && documents.length > 0
+        ? documents[documents.length - 1]
+        : undefined,
+    [documents],
+  );
   const hitboxRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -81,7 +87,7 @@ export function DocumentPreview({
   }
 
   if (isDocumentsFetching) {
-    return <LoadingSkeleton/>;
+    return <LoadingSkeleton />;
   }
 
   const document: Document | null = previewDocument
@@ -97,7 +103,7 @@ export function DocumentPreview({
         }
       : null;
 
-  if (!document) return <LoadingSkeleton/>;
+  if (!document) return <LoadingSkeleton />;
 
   return (
     <div className="relative w-full cursor-pointer">
@@ -229,7 +235,8 @@ const DocumentContent = ({ document }: { document: Document }) => {
   const containerClassName = cn(
     'h-[257px] overflow-y-scroll border rounded-b-2xl dark:bg-muted border-t-0 dark:border-zinc-700',
     {
-      'p-4 sm:px-14 sm:py-16': document.kind === 'text' || document.kind === 'tiptap',
+      'p-4 sm:px-14 sm:py-16':
+        document.kind === 'text' || document.kind === 'tiptap',
     },
   );
 
@@ -253,7 +260,10 @@ const DocumentContent = ({ document }: { document: Document }) => {
           </div>
         </div>
       ) : document.kind === 'tiptap' ? (
-        <div className="prose dark:prose-invert max-w-none" dangerouslySetInnerHTML={{ __html: document.content ?? '' }} />
+        <div
+          className="prose dark:prose-invert max-w-none"
+          dangerouslySetInnerHTML={{ __html: document.content ?? '' }}
+        />
       ) : null}
     </div>
   );

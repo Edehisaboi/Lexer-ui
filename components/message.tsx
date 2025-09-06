@@ -16,7 +16,7 @@ import {
 } from './elements/tool';
 import { MessageActions } from './message-actions';
 import { PreviewAttachment } from './preview-attachment';
-import { Weather } from './weather';
+//import { Weather } from './weather';
 import equal from 'fast-deep-equal';
 import { cn, sanitizeText } from '@/lib/utils';
 import { Button } from './ui/button';
@@ -174,19 +174,30 @@ const PurePreviewMessage = ({
                 }
               }
 
-              if (type === 'tool-getWeather') {
+              if (type === 'tool-createDocument') {
                 const { toolCallId, state } = part;
 
                 return (
                   <Tool key={toolCallId} defaultOpen={true}>
-                    <ToolHeader type="tool-getWeather" state={state} />
+                    <ToolHeader type="tool-createDocument" state={state} />
                     <ToolContent>
                       {state === 'input-available' && (
                         <ToolInput input={part.input} />
                       )}
                       {state === 'output-available' && (
                         <ToolOutput
-                          output={<Weather weatherAtLocation={part.output} />}
+                          output={
+                            'error' in part.output ? (
+                              <div className="p-2 text-red-500 rounded border">
+                                Error: {String(part.output.error)}
+                              </div>
+                            ) : (
+                              <DocumentPreview
+                                isReadonly={isReadonly}
+                                result={part.output}
+                              />
+                            )
+                          }
                           errorText={undefined}
                         />
                       )}
@@ -195,12 +206,12 @@ const PurePreviewMessage = ({
                 );
               }
 
-              if (type === 'tool-createDocument') {
+              if (type === 'tool-createLegalDocument') {
                 const { toolCallId, state } = part;
 
                 return (
                   <Tool key={toolCallId} defaultOpen={true}>
-                    <ToolHeader type="tool-createDocument" state={state} />
+                    <ToolHeader type="tool-createLegalDocument" state={state} />
                     <ToolContent>
                       {state === 'input-available' && (
                         <ToolInput input={part.input} />

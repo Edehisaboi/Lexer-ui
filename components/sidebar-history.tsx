@@ -86,7 +86,10 @@ export function getChatHistoryPaginationKey(
 
   if (pageIndex === 0) return `/api/history?limit=${PAGE_SIZE}`;
 
-  const firstChatFromPage = previousPageData.chats.at(-1);
+  const firstChatFromPage =
+    previousPageData.chats.length > 0
+      ? previousPageData.chats[previousPageData.chats.length - 1]
+      : undefined;
 
   if (!firstChatFromPage) return null;
 

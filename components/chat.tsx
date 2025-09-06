@@ -11,7 +11,11 @@ import { Artifact } from './artifact';
 import { MultimodalInput } from './multimodal-input';
 import { Messages } from './messages';
 import type { VisibilityType } from './visibility-selector';
-import { useArtifactSelector, useArtifact, initialArtifactData } from '@/hooks/use-artifact';
+import {
+  useArtifactSelector,
+  useArtifact,
+  initialArtifactData,
+} from '@/hooks/use-artifact';
 import { unstable_serialize } from 'swr/infinite';
 import { getChatHistoryPaginationKey } from './sidebar-history';
 import { toast } from './toast';
@@ -70,7 +74,8 @@ export function Chat({
         return {
           body: {
             id,
-            message: messages.at(-1),
+            message:
+              messages.length > 0 ? messages[messages.length - 1] : undefined,
             selectedChatModel: initialChatModel,
             selectedVisibilityType: visibilityType,
             ...body,
