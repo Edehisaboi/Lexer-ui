@@ -14,6 +14,8 @@ import {
   getChatById,
   getMessageCountByUserId,
   getMessagesByChatId,
+  getChatMissingInfoById,
+  getChatModelById,
   saveChat,
   saveMessages,
 } from '@/lib/db/queries';
@@ -139,11 +141,18 @@ export async function POST(request: Request) {
     const streamId = generateUUID();
     await createStreamId({ streamId, chatId: id });
 
+    // get missing info and current model from db
+    const missingInfo = await getChatMissingInfoById({ chatId: id });
+    const currentModel = await getChatModelById({ chatId: id });
+
     const stream = createUIMessageStream({
       execute: ({ writer: dataStream }) => {
         const result = streamText({
-          model: myProvider.languageModel(selectedChatModel),
-          system: systemPrompt({ selectedChatModel }),
+          model: myProvider.languageModel(currentModel),
+          system: systemPrompt({
+            currentModel: currentModel,
+            missingInfo: missingInfo,
+          }),
           messages: convertToModelMessages(uiMessages),
           stopWhen: stepCountIs(5),
           experimental_activeTools: [
@@ -161,8 +170,9 @@ export async function POST(request: Request) {
             //   dataStream,
             // }),
             createLegalDocument: createLegalDocument({
-              session,
-              dataStream,
+              session: session,
+              currentModel: currentModel,
+              dataStream: dataStream,
               chatId: id,
             }),
           },
