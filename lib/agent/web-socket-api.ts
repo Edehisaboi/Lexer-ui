@@ -6,7 +6,7 @@ export type Callbacks = {
   onStreamingEnd?: () => void;
   onChunk?: (chunk: string) => void;
   onUpdate?: (node: string) => void;
-  onInterrupt?: (payload: string) => void;
+  onInterrupt?: (payload: string) => void | Promise<void>;
 };
 
 type CallbackType =
@@ -254,9 +254,12 @@ export class WebSocketApiService {
     }
 
     if (callbacks.onInterrupt) {
-      this.messageCallbacks.set('interrupt', (payload) =>
-        callbacks.onInterrupt?.(String(payload)),
-      );
+      this.messageCallbacks.set('interrupt', async (payload) => {
+        const result = callbacks.onInterrupt?.(String(payload));
+        if (result instanceof Promise) {
+          await result;
+        }
+      });
     }
 
     if (callbacks.onChunk) {
