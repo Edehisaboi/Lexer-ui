@@ -3,17 +3,24 @@ import { tool, type UIMessageStreamWriter } from 'ai';
 import { z } from 'zod';
 import type { Session } from 'next-auth';
 import { WebSocketApiService } from '@/lib/agent/web-socket-api';
-import { saveDocument } from '@/lib/db/queries';
+import {
+  saveDocument,
+  updateChatMissingInfoById,
+  deleteChatMissingInfoById,
+  updateChatModelById,
+} from '@/lib/db/queries';
 import type { ChatMessage } from '@/lib/types';
 
 interface CreateLegalDocumentProps {
   session: Session;
+  currentModel: string;
   dataStream: UIMessageStreamWriter<ChatMessage>;
   chatId: string;
 }
 
 export const createLegalDocument = ({
   session,
+  currentModel,
   dataStream,
   chatId,
 }: CreateLegalDocumentProps) =>
@@ -21,14 +28,11 @@ export const createLegalDocument = ({
     description:
       'Create a legal document for a legal advice, contract or other legal writing.',
     inputSchema: z.object({
-      isNewDocument: z
-        .boolean()
-        .describe('Is this a new document being created?'),
       message: z
         .string()
         .describe('The entire user message, for requesting a legal document'),
     }),
-    execute: async ({ isNewDocument, message }) => {
+    execute: async ({ message }) => {
       const id = generateUUID();
       const documentService = new WebSocketApiService();
       let interruptContent: string | null = null;
@@ -63,6 +67,8 @@ export const createLegalDocument = ({
         id: id,
       });
 
+      const isNewDocument = currentModel === 'main-model';
+
       await documentService.generateDocument(chatId, isNewDocument, message, {
         onChunk: (chunk) => {
           dataStream.write({
@@ -71,8 +77,16 @@ export const createLegalDocument = ({
             transient: true,
           });
         },
-        onInterrupt: (payload) => {
+        onInterrupt: async (payload) => {
           interruptContent = payload;
+          await updateChatMissingInfoById({
+            chatId,
+            missingInfo: payload,
+          });
+          await updateChatModelById({
+            chatId,
+            model: 'questioning-model',
+          });
         },
         onUpdate: (node) => {
           const thinkingMessage =
@@ -94,9 +108,15 @@ export const createLegalDocument = ({
             kind: 'tiptap',
             userId: session.user.id,
           });
+          await deleteChatMissingInfoById({
+            chatId,
+          });
+          await updateChatModelById({
+            chatId,
+            model: 'main-model',
+          });
         },
         onStreamingEnd: () => {
-          // End reasoning stream
           dataStream.write({
             type: 'reasoning-end',
             id: id,
