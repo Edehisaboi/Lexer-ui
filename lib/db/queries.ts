@@ -452,8 +452,9 @@ export async function deleteMessagesByChatIdAfterTimestamp({
   }
 }
 
-export async function updateChatVisiblityById({
+export async function updateChatVisibilityById({
   chatId,
+
   visibility,
 }: {
   chatId: string;
@@ -533,6 +534,86 @@ export async function getStreamIdsByChatId({ chatId }: { chatId: string }) {
     throw new ChatSDKError(
       'bad_request:database',
       'Failed to get stream ids by chat id',
+    );
+  }
+}
+
+export async function updateChatMissingInfoById({
+  chatId,
+  missingInfo,
+}: {
+  chatId: string;
+  missingInfo: string;
+}) {
+  try {
+    return await db
+      .update(chat)
+      .set({ missingInfo })
+      .where(eq(chat.id, chatId));
+  } catch (error) {
+    throw new ChatSDKError(
+      'bad_request:database',
+      'Failed to update chat missing info by id',
+    );
+  }
+}
+
+export async function getChatMissingInfoById({ chatId }: { chatId: string }) {
+  try {
+    const [selectedChat] = await db
+      .select()
+      .from(chat)
+      .where(eq(chat.id, chatId));
+    return selectedChat?.missingInfo;
+  } catch (error) {
+    throw new ChatSDKError(
+      'bad_request:database',
+      'Failed to get chat missing info by id',
+    );
+  }
+}
+
+export async function deleteChatMissingInfoById({
+  chatId,
+}: { chatId: string }) {
+  try {
+    return await db
+      .update(chat)
+      .set({ missingInfo: null })
+      .where(eq(chat.id, chatId));
+  } catch (error) {
+    throw new ChatSDKError(
+      'bad_request:database',
+      'Failed to delete chat missing info by id',
+    );
+  }
+}
+
+export async function updateChatModelById({
+  chatId,
+  model,
+}: { chatId: string; model: 'main-model' | 'questioning-model' }) {
+  try {
+    return await db.update(chat).set({ model }).where(eq(chat.id, chatId));
+  } catch (error) {
+    throw new ChatSDKError(
+      'bad_request:database',
+      'Failed to update chat model by id',
+    );
+  }
+}
+
+export async function getChatModelById({ chatId }: { chatId: string }) {
+  try {
+    const [selectedChat] = await db
+      .select()
+      .from(chat)
+      .where(eq(chat.id, chatId));
+    return selectedChat?.model;
+  } catch (error) {
+    throw new ChatSDKError(
+      'bad_request:database',
+      'Failed to get chat model by id',
     );
   }
 }
