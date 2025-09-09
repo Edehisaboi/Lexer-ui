@@ -61,7 +61,6 @@ export const createLegalDocument = ({
         transient: true,
       });
 
-      // Start a reasoning stream
       dataStream.write({
         type: 'reasoning-start',
         id: id,
@@ -92,7 +91,6 @@ export const createLegalDocument = ({
           const thinkingMessage =
             agentUpdatesMessage[node] ?? 'Working on your document...';
 
-          // Stream the thinking message to the UI
           dataStream.write({
             type: 'reasoning-delta',
             id: id,
